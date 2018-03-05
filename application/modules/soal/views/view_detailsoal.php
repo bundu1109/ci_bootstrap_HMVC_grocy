@@ -1157,15 +1157,16 @@
 
             
             $.ajax({
-                url: "test.php",
+                url: "<?php echo BASE_URL;?>/soal/update",
                 type: "post",
-                data: { id_peserta: updatedRow.data()[2] , soal_peserta : updatedRow.data()[3]  },
+                data: { id_peserta: updatedRow.data()[2] , soal_peserta : updatedRow.data()[3],  id_atasan:updatedRow.data()[4],soal_atasan:updatedRow.data()[5]  },
                 success: function (response) {
-                // you will get response from your php page (what you echo or print)                 
+                // you will get response from your php page (what you echo or print)   
+                    alert(response);              
 
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
-                console.log(textStatus, errorThrown);
+                    alert(textStatus, errorThrown);
                 }
 
 

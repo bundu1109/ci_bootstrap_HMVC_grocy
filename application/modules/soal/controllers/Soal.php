@@ -45,7 +45,7 @@ class Soal extends MX_Controller
                                 <span class="sr-only">Toggle Dropdown</span>
                                 </button>
                                 <ul class="dropdown-menu" role="menu">
-                                <li><a href="lihat/' . $row->kode_pembelajaran . '/"><i class="fa fa-fw fa-list-alt"></i>Lihat</a></li>
+                                <li><a href="soal/lihat/' . $row->kode_pembelajaran . '/"><i class="fa fa-fw fa-list-alt"></i>Lihat</a></li>
                                 <li><a href="#"><i class="fa fa-fw fa-times"></i>Hapus</a></li>
                                 </ul>
                             </div>';
@@ -113,6 +113,12 @@ class Soal extends MX_Controller
             redirect('404_override', 'refresh');
             //echo $this->uri->segment(3);
         }
+
+    }
+
+    public function update()
+    {
+      echo $this->input->get_post('soal_peserta'); 
 
     }
 
