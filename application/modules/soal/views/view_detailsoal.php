@@ -786,8 +786,9 @@
                         <!-- box-header -->
                         <div class="box">
                             <div class="box-header">
+                                <br>
                                 <h3 class="box-title">Soal Evaluasi Level 3 :
-                                    <?php echo $kode?>
+                                  <b>  <?php echo $judul." (".$kode.")";?> </b>
                                 </h3>
                                 <div class="box-tools pull-right">
                                     <button type="button" class="btn btn-box-tool" data-widget="collapse">
@@ -806,14 +807,20 @@
                                 <table id="detail_soal" class="table table-bordered table-striped responsive" cellspacing="0" width="100%">
                                     <thead>
                                         <tr>
-                                            <th>No</th>
-                                            <th>No Index</th>
-                                            <th>Id Soal Peserta</th>
-                                            <th>Soal Peserta </th>
-                                            <th>Id Soal Atasan</th>
-                                            <th>Soal Atasan</th>
-
-                                        </tr>      
+                                            <th rowspan="2">No</th>
+                                            <th colspan="4"><center>Soal Peserta</center></th>                                            
+                                            <th colspan="4"><center>Soal Atasan</center></th>
+                                        </tr>
+                                        <tr>                                           
+                                            <th>Id</th>
+                                            <th>No Index</th>                                            
+                                            <th><center>Soal</center></th>
+                                            <th></th>
+                                            <th>Id</th>
+                                            <th>No Index</th>                                            
+                                            <th><center>Soal</center></th>
+                                            <th></th>
+                                        </tr>       
                                     </thead>
                                     <tbody>
                                         <?php
@@ -822,11 +829,22 @@
                                                 $no++;
                                                 echo "<tr>";
                                                     echo "<td>".$no."</td>";
-                                                    echo "<td>".$row->no_indexsoal."</td>";
-                                                    echo "<td>".$row->peserta_id."</td>";
+                                                    echo "<td>".$row->id_peserta."</td>";
+                                                    echo "<td>".$row->noIndex_peserta."</td>";
                                                     echo "<td>".$row->soal_peserta."</td>";
-                                                    echo "<td>".$row->atasan_id."</td>";
+                                                    echo "<td>";
+                                                        if ($row->id_peserta) {
+                                                            echo "<button type='button' data-toggle='modal' data-target='#modal-default".$row->id_peserta."' class='btn btn-danger btn-xs'><i class='fa fa-window-close' aria-hidden='true'></i></button>";
+                                                        }                                                        
+                                                    echo "</td>";
+                                                    echo "<td>".$row->id_atasan."</td>";
+                                                    echo "<td>".$row->noIndex_atasan."</td>";
                                                     echo "<td>".$row->soal_atasan."</td>";
+                                                    echo "<td>";
+                                                        if ($row->id_atasan) {
+                                                            echo "<button type='button' data-toggle='modal' data-target='#modal-default".$row->id_atasan."' class='btn btn-danger btn-xs'><i class='fa fa-window-close' aria-hidden='true'></i></button>";
+                                                        }
+                                                    echo "</td>";
                                                 echo "</tr>";
                                             }
 
@@ -846,6 +864,102 @@
             </section>
             <!-- /.content -->
         </div>
+
+
+        <!-- MODAL HAPUS PESERTA dan ATASAN -->
+        <?php
+            foreach($query as $row){
+        ?>
+                
+        <!-- Modal Peserta -->
+        <div class="modal fade" id="modal-default<?php echo $row->id_peserta;?>">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Hapus Soal Untuk Peserta</h4>
+              </div>
+              <div class="modal-body">
+
+                <p><?php echo $row->soal_peserta;?></p>
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                <button type="button" onclick="hapusSoal('<?php echo $row->id_peserta;?>')" class="btn btn-primary">Hapus</button>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->    
+
+        <!-- Modal Atasan -->
+        <div class="modal fade" id="modal-default<?php echo $row->id_atasan;?>">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Hapus Soal Untuk Atasan</h4>
+              </div>
+              <div class="modal-body">
+
+                <p><?php echo $row->soal_atasan;?></p>
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                <button type="button" onclick="hapusSoal('<?php echo $row->id_atasan;?>')" class="btn btn-primary">Hapus</button>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal --> 
+
+        <?php
+            }
+        ?>
+
+        <div class="modal modal-success fade" id="modal-success">
+          <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+              <div class="modal-body">
+                <p>HAPUS SUKSES</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+
+        <div class="modal modal-success fade" id="modal-insert-success">
+          <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+              <div class="modal-body">
+                <p>UPDATE DATA SUKSES</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+
+
+
+
         <!-- /.content-wrapper -->
         <footer class="main-footer">
             <div class="pull-right hidden-xs">
@@ -1089,27 +1203,36 @@
                 "info": false,
                 "searching": false,
                 "columnDefs": [{
-                    "targets": [0, 1, 2, 3, 4, 5],
+                    "targets": [0, 1, 2, 3, 4, 5,6,7,8],
                     "orderable": false,
                     "className": "text-left",
                 }, ],
                 "columns": [{
-                        "width": "5%"
+                        "width": "4%"
                     },
                     {
-                        "width": "5%"
+                        "width": "2%"
                     },
                     {
-                        "width": "5%"
+                        "width": "4%"
                     },
                     {
-                        "width": "40%"
+                        "width": "39%"
                     },
                     {
-                        "width": "5%"
+                        "width": "3%"
                     },
                     {
-                        "width": "40%"
+                        "width": "2%"
+                    },
+                    {
+                        "width": "4%"
+                    },
+                    {
+                        "width": "39%"
+                    },
+                    {
+                        "width": "3%"
                     }
                 ]
             });
@@ -1117,7 +1240,7 @@
             dataTable.MakeCellsEditable({
                 "onUpdate": myCallbackFunction,
                 "inputCss": 'my-input-class',
-                "columns": [1,3,5],
+                "columns": [2,3,6,7],
                 "allowNulls": {
                     //"columns": [3],
                     //"errorClass": 'error'
@@ -1128,7 +1251,7 @@
                 },
                 "inputTypes": [
                     {
-                        "column": 1,
+                        "column": 2,
                         "type": "text",
                         "options": null
                     },
@@ -1138,7 +1261,12 @@
                         "options": null
                     },
                     {
-                        "column": 5,
+                        "column": 6,
+                        "type": "text",
+                        "options": null
+                    },
+                    {
+                        "column": 7,
                         "type": "textarea",
                         "options": null
                     },
@@ -1148,6 +1276,47 @@
             });
         });
 
+        $('#modal-success').on('hidden.bs.modal', function (e) {
+            // do something...
+            location.reload();
+        })
+        function hapusSoal(idSoal) {
+
+            //alert(idSoal);
+            $.ajax({
+                    url: "<?php echo BASE_URL;?>/soal/hapus",
+                    type: "post",
+                    data: { id_soal: idSoal},
+                    success: function (response) {
+                    // you will get response from your php page (what you echo or print)   
+                        //alert(response);  
+                        
+                        if (response == "1"){
+
+                            $('.modal').modal('hide');
+                            $('#modal-success').modal('show');
+                            //location.reload();
+
+                        } else {
+                            alert("Hapus GAGAL");
+                        }
+                       
+
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert(textStatus, errorThrown);
+                    }
+
+
+                });
+
+        }
+        
+        $('#modal-insert-success').on('hidden.bs.modal', function (e) {
+            // do something...
+            location.reload();
+        })
+
         function myCallbackFunction (updatedCell, updatedRow, oldValue) {
             console.log("The new value for the cell is: " + updatedCell.data());
             console.log("The old value for that cell was: " + oldValue);
@@ -1155,22 +1324,42 @@
             
             console.log(updatedRow.data()[2]);
 
+            var newValue = updatedCell.data();
+            var oldValue = oldValue;
+
+            if (newValue != oldValue){
+                console.log("Ajax Start...");
+                
+              
+                $.ajax({
+                    url: "<?php echo BASE_URL;?>/soal/update",
+                    type: "post",
+                    data: { judul_pembelajaran : "<?php echo $judul?>",kode_pembelajaran: "<?php echo $kode?>" ,id_peserta: updatedRow.data()[1] , no_indexPeserta : updatedRow.data()[2], soalPeserta : updatedRow.data()[3], id_atasan: updatedRow.data()[5] , no_indexAtasan : updatedRow.data()[6], soalAtasan : updatedRow.data()[7] },
+                    success: function (response) {
+                    // you will get response from your php page (what you echo or print)   
+                        //alert(response);  
+                        
+                        if (response == "trueTRUE"){
+                            //alert("Update SUKSES");
+                            $('#modal-insert-success').modal('show');
+
+                        } else {
+                            alert("Update GAGAL");
+                        }
+                        
+
+
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert(textStatus, errorThrown);
+                    }
+
+
+                });
+                
+                
+            }     
             
-            $.ajax({
-                url: "<?php echo BASE_URL;?>/soal/update",
-                type: "post",
-                data: { id_peserta: updatedRow.data()[2] , soal_peserta : updatedRow.data()[3],  id_atasan:updatedRow.data()[4],soal_atasan:updatedRow.data()[5]  },
-                success: function (response) {
-                // you will get response from your php page (what you echo or print)   
-                    alert(response);              
-
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    alert(textStatus, errorThrown);
-                }
-
-
-            });
             
         }
 

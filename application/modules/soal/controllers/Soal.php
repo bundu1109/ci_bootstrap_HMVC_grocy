@@ -77,20 +77,17 @@ class Soal extends MX_Controller
                 $sub_array[] = $row->peserta_id;
                 $sub_array[] = $row->soal_peserta;
                 $sub_array[] = $row->atasan_id;
-                $sub_array[] = $row->soal_atasan;              
-               
+                $sub_array[] = $row->soal_atasan;
 
                 $data[] = $sub_array;
             }
             $output = array(
-                "data" => $data
+                "data" => $data,
             );
             echo json_encode($output);
 
         }
-        
-        
-        
+
     }
 
     public function jumlah_soal()
@@ -104,8 +101,9 @@ class Soal extends MX_Controller
         if ($this->uri->segment(3)) {
 
             $this->load->model("Model_soal");
-            $fetch_data['query'] = $this->Model_soal->get_soal($this->uri->segment(3));          
+            $fetch_data['query'] = $this->Model_soal->get_soal($this->uri->segment(3));
             $fetch_data['kode'] = $this->uri->segment(3);
+            $fetch_data['judul'] = $this->Model_soal->get_judul($this->uri->segment(3));            
 
             $this->load->view('view_detailsoal', $fetch_data);
 
@@ -116,9 +114,124 @@ class Soal extends MX_Controller
 
     }
 
+    public function hapus()
+    {
+        $id_soal = $this->input->get_post('id_soal');  
+        $this->load->model("Model_soal");
+        echo $this->Model_soal->hapus_id($id_soal);
+    }
     public function update()
     {
-      echo $this->input->get_post('soal_peserta'); 
+        $this->load->helper('date');
+
+        $id_peserta = $this->input->get_post('id_peserta');      
+        $data_peserta = array(            
+            'soal' => $this->input->get_post('soalPeserta'),
+            'no_indexsoal' => $this->input->get_post('no_indexPeserta')         
+        );
+
+        // insert if non $id_peserta 
+        if ($id_peserta == ''){
+            
+            $datestring = '%d/%m/%Y - %h:%i %a';
+            $time = now('Asia/Jakarta');
+            $created = mdate($datestring, $time);
+
+            $data = array(
+                'kode_pembelajaran' => $this->input->get_post('kode_pembelajaran'),
+                'judul_pembelajaran' => $this->input->get_post('judul_pembelajaran'),
+                'no_soal' => '5',
+                'no_indexsoal' => '0',
+                'soal' => $this->input->get_post('soalPeserta'),
+                'untuk' => 'peserta',
+                'created'=> $created
+            );
+        
+            $this->db->insert('serasi_soal', $data);
+           
+        }
+
+        
+        $id_atasan = $this->input->get_post('id_atasan'); 
+        $data_atasan = array(           
+            'soal' => $this->input->get_post('soalAtasan'),
+            'no_indexsoal' => $this->input->get_post('no_indexAtasan')  
+        );  
+
+        // insert if non $id_atasan
+        if ($id_atasan == ''){
+
+            $datestring = '%d/%m/%Y - %h:%i %a';
+            $time = now('Asia/Jakarta');
+            $created = mdate($datestring, $time);
+
+            $data = array(
+                'kode_pembelajaran' => $this->input->get_post('kode_pembelajaran'),
+                'judul_pembelajaran' => $this->input->get_post('judul_pembelajaran'),
+                'no_soal' => '5',
+                'no_indexsoal' => '0',
+                'soal' => $this->input->get_post('soalAtasan'),
+                'untuk' => 'atasan',
+                'created'=> $created
+            );
+        
+            $this->db->insert('serasi_soal', $data);
+           
+        }
+
+        // update SOal Peserta 
+        $this->db->trans_start(); // catch transaction        
+        $this->db->where('id', $id_peserta);
+        $this->db->update('serasi_soal', $data_peserta);
+        
+        $this->db->trans_complete(); // end catch
+
+        // was there any update or error?
+        if ($this->db->affected_rows() == '1') {
+            
+            echo "true";
+             // update SOal Atasan 
+            $this->db->trans_start(); // catch transaction        
+            $this->db->where('id', $id_atasan);
+            $this->db->update('serasi_soal', $data_atasan);
+            
+            $this->db->trans_complete(); // end catch
+            if ($this->db->affected_rows() == '1') {
+                echo "TRUE";
+            } else {
+                // if any trans error
+                if ($this->db->trans_status() === false) {
+                    echo "FALSE";
+                } else {
+                    echo "TRUE";    
+                }
+            }
+
+        } else {
+            // if any trans error
+            if ($this->db->trans_status() === false) {
+                echo "false";
+            } else {
+                echo "true";
+                 // update SOal Atasan 
+                $this->db->trans_start(); // catch transaction        
+                $this->db->where('id', $id_atasan);
+                $this->db->update('serasi_soal', $data_atasan);
+                
+                $this->db->trans_complete(); // end catch
+                if ($this->db->affected_rows() == '1') {
+                    echo "TRUE";
+                } else {
+                    // if any trans error
+                    if ($this->db->trans_status() === false) {
+                        echo "FALSE";
+                    } else {
+                        echo "TRUE";    
+                    }
+                }
+            }
+        }
+        
 
     }
 

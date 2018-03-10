@@ -57,6 +57,13 @@ class Model_soal extends CI_Model
         $query = $this->db->get();
         return $query->num_rows();
     }
+
+    public function hapus_id($idSoal)
+    {
+        $this->db->where('id', $idSoal);
+        $this->db->delete('serasi_soal');
+        return $this->db->affected_rows();
+    }
     public function get_all_data()
     {
         /*
@@ -86,13 +93,41 @@ class Model_soal extends CI_Model
 
     public function get_soal($kode_judul){
         
-        $sql = "SELECT tmp.no_indexsoal,tmp.id as peserta_id, tmp.soal as soal_peserta,tmp2.id as atasan_id,tmp2.soal as soal_atasan from (select * from serasi_soal where kode_pembelajaran = ? && untuk = ?) as tmp LEFT JOIN (select * from serasi_soal where kode_pembelajaran = ? && untuk = ?) as tmp2 on tmp.no_indexsoal = tmp2.no_indexsoal";    
+        $jmlh_soalPeserta = $this->get_soalexist($kode_judul, "peserta");
+        $jmlh_soalAtasan = $this->get_soalexist($kode_judul, "atasan");
 
-        $query = $this->db->query($sql, array($kode_judul, 'peserta',$kode_judul, 'atasan'));
+        if ($jmlh_soalPeserta >= $jmlh_soalAtasan){
+            $var_join = 'LEFT JOIN';
+        } else {
+            $var_join = 'RIGHT JOIN';
+        }
+
+
+       
+        /*
+        $sql = "SELECT tmp.no_indexsoal,tmp.id as peserta_id, tmp.soal as soal_peserta,tmp2.id as atasan_id,tmp2.soal as soal_atasan from (select * from serasi_soal where kode_pembelajaran = ? && untuk = ?) as tmp LEFT JOIN (select * from serasi_soal where kode_pembelajaran = ? && untuk = ?) as tmp2 on tmp.no_indexsoal = tmp2.no_indexsoal";    
+        */
+
+        $sql = "select tmpPeserta.id as id_peserta,tmpPeserta.no_indexsoal as noIndex_peserta,tmpPeserta.soal as soal_peserta,tmpAtasan.id as id_atasan,tmpAtasan.no_indexsoal as noIndex_atasan,tmpAtasan.soal as soal_atasan from (SELECT (@cnt := @cnt + 1) AS rowNumber, t1.* from (select id,no_indexsoal,soal,untuk FROM serasi_soal WHERE kode_pembelajaran = ? && untuk = ? ORDER BY id) as t1 CROSS JOIN (SELECT @cnt := 0) AS dummy1) as tmpPeserta ".$var_join." (SELECT (@cnt2 := @cnt2 + 1) AS rowNumber, t2.* from (select id,no_indexsoal,soal,untuk FROM serasi_soal WHERE kode_pembelajaran = ? && untuk = ? ORDER BY id) as t2 CROSS JOIN (SELECT @cnt2 := 0) AS dummy2) as tmpAtasan on tmpPeserta.rowNumber = tmpAtasan.rowNumber";
+
+
+        $query = $this->db->query($sql, array($kode_judul, 'peserta', $kode_judul, 'atasan'));
+        //$query = $this->db->query($sql);
         return $query->result();
     }
 
     public function get_judul($kode_judul){
+
+        $this->db->select('judul_pembelajaran');
+        $this->db->from('serasi_judul');
+        $this->db->where('kode_pembelajaran', $kode_judul);        
+        $query = $this->db->get();
+        $row = $query->row();
+
+        if (isset($row))
+        {
+                return $row->judul_pembelajaran;
+        }
 
     }
 }
